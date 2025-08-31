@@ -1,0 +1,222 @@
+body { 
+    background-image: 
+        linear-gradient(
+            to bottom,
+            rgba(10, 0, 10, 1) 0%,        /* very dark purplish black */
+            rgba(40, 0, 40, 0.95) 40%,   /* still almost black */
+            rgba(90, 0, 90, 0.7) 70%,    /* deep purple, slightly transparent */
+            rgba(128, 0, 128, 0.0) 100%  /* fade out completely at bottom */
+        ),
+        url(img/Artboard_1.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#WAVORA {
+    text-align: center;
+    color: white;
+    margin-top: 80px;
+    font-family: "Nunito", "Poppins", sans-serif;
+  font-weight: 100; 
+  letter-spacing: 1px; /* adds a little spacing between letters */
+}    
+.navigationbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 3 sections: left, center, right */
+  background-color: #0f0f0f;
+  padding: 0 30px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  border-bottom: 1px solid gray;
+  height: 60px;
+  box-sizing: border-box;
+}
+.navbar-center {
+  display: flex;
+  gap: 30px; /* spacing between buttons */
+  margin-left: 75px;
+}
+
+.navbar-buttons {
+  color: grey;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-decoration: none; /* removes underline */
+  transition: color 0.3s ease; /* smooth hover effect */
+}
+.navbar-buttons:hover {
+  color: white; /* changes color on hover */
+}
+/* Right search section */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.WAVORA-LOGO {
+    height: 90px;
+    width: auto;
+    margin-left: 40px;
+}
+.navbar-spacer {
+    flex: 1;
+}
+.navbar-search {
+    padding: 6px 36px 6px 12px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background-color: #0f0f0f;
+    color: white;
+}
+.search-icon{
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px; /* hidden */
+  width: 250px;
+  height: 100%;
+  background: #0f0f0f;
+  color: #fff;
+  transition: left 0.3s ease;
+  z-index: 200;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.sidebar.open {
+  left: 0;
+}
+
+/* Full-height sidebar toggle button */
+#sidebar-toggle-btn {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh; /* full height of the screen */
+  width: 40px;   /* thickness of the strip */
+  background: #0f0f0f;
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 201;
+  border-radius: 0 4px 4px 0;
+  transition: left 0.3s ease;
+  border-right: 1px solid gray;
+}
+
+/* Move button with sidebar */
+#sidebar-toggle-btn.attached {
+  left: 250px; /* sidebar width */
+}
+/* Dropdown button style */
+.dropdown-btn {
+  background: none;
+  border: none;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+}
+
+.dropdown-btn:hover {
+  background: #0f0f0f;
+}
+
+/* Container (hidden by default) */
+.dropdown-container {
+  max-height: 0; 
+  overflow: hidden;             
+  background-color: #0f0f0f;
+  padding-left: 15px;
+  transition: max-height 0.3s ease-out; /* smooth animation */
+}
+
+
+.dropdown-container a {
+  display: block;
+  padding: 8px 0;
+  color: grey;
+  background-color: #0f0f0f;
+  text-decoration: none;
+}
+
+.dropdown-container a:hover {
+  color: white;
+}
+.search-bar {
+  text-align: center;  /* keeps input centered */
+  margin-top: 0px;
+}
+
+.search-bar input {
+  width: 60%;                  /* wider */
+  max-width: 600px;            /* limit on large screens */
+  padding: 12px 20px;          /* more comfy */
+  
+  border-radius: 40px;         /* smoother edges */
+  border: none;
+  outline: none;
+  
+  font-size: 18px;
+  text-align: left;
+  
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* soft shadow */
+  transition: box-shadow 0.3s ease;       /* smooth hover/focus */
+}
+
+.search-bar input:focus {
+  box-shadow: 0 0 15px rgba(128, 0, 128, 0.6); /* purple glow on focus */
+}
+#الجملة-المتينة{
+  color: white;
+  text-align: center;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  margin-top: 120px;
+}
+.wallpaper-container {
+  background: rgba(15, 15, 15, 0.8); /* semi-transparent #0f0f0f */
+  border-radius: 12px;
+  padding: 20px;
+  margin: 40px auto;
+  max-width: 1200px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* exactly 3 columns */
+  gap: 20px;
+}
+
+.wallpaper-box {
+  background: #1a1a1a;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.wallpaper-box img {
+  width: 100%;
+  display: block;
+}
+
+
+.wallpaper-box:hover {
+  transform: scale(1.05); /* zoom effect on hover */
+}

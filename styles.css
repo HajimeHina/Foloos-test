@@ -58,6 +58,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
 }
 .WAVORA-LOGO {
     height: 90px;
@@ -68,22 +69,27 @@ body {
     flex: 1;
 }
 .navbar-search {
-    padding: 6px 36px 6px 12px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    background-color: #0f0f0f;
-    color: white;
+  padding: 6px 36px 6px 12px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background-color: #0f0f0f;
+  color: white;
 }
-.search-icon{
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+.search-icon:hover {
+  opacity: 1;
 }
 .sidebar {
   position: fixed;
@@ -193,14 +199,13 @@ body {
   margin-top: 120px;
 }
 .wallpaper-container {
-  background: rgba(15, 15, 15, 0.8); /* semi-transparent #0f0f0f */
+  background: rgba(15, 15, 15, 0.8);
   border-radius: 12px;
   padding: 20px;
   margin: 40px auto;
   max-width: 1200px;
-
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* exactly 3 columns */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -209,14 +214,93 @@ body {
   border-radius: 10px;
   overflow: hidden;
   position: relative;
+  aspect-ratio: 16/9; /* Ensures consistent dimensions */
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .wallpaper-box img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
+  transition: opacity 0.3s ease;
 }
 
+.wallpaper-box a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease;
+}
 
 .wallpaper-box:hover {
-  transform: scale(1.05); /* zoom effect on hover */
+  transform: scale(1.02); /* Subtle zoom effect */
+}
+
+/* Enhanced progress bar */
+.progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 0;
+  background: linear-gradient(90deg, #9d4edd, #c77dff, #e0aaff);
+  border-radius: 0 0 2px 2px;
+  z-index: 20; /* Increased from 10 to ensure it's on top */
+  box-shadow: 0 2px 8px rgba(157, 78, 221, 0.3);
+}
+
+/* Loading state indicator */
+.wallpaper-box.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #9d4edd;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 1s linear infinite;
+  z-index: 5;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+.wallpaper-box.video-wallpaper {
+  overflow: hidden;
+}
+
+.wallpaper-box.video-wallpaper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  z-index: 1;
+}
+@media (max-width: 768px) {
+  .wallpaper-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 15px;
+    margin: 20px auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallpaper-container {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .wallpaper-box:hover {
+    transform: none; /* Disable hover effects on mobile */
+  }
 }

@@ -25,9 +25,6 @@ document.querySelectorAll(".dropdown-btn").forEach(btn => {
   });
 });
 
-// Remove or comment out the duplicate video loading code (the first block)
-// This is causing conflicts with your hover functionality
-
 // Fixed hover functionality for video wallpapers
 document.addEventListener('DOMContentLoaded', function() {
   const videoBoxes = document.querySelectorAll('.wallpaper-box.video-wallpaper');
@@ -58,17 +55,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // Force reflow so next transition applies
       void progressBar.offsetWidth;
 
-      // Start animating
-      progressBar.style.transition = 'width 2s ease-out';
-      progressBar.style.width = '100%';
-
       // Create video element and start loading immediately
       video = document.createElement('video');
-      video.src = box.getAttribute('data-src'); // Changed from data-full to data-src
-      video.autoplay = false; // We'll play manually when ready
+      video.src = box.getAttribute('data-src');
+      video.autoplay = false;
       video.loop = true;
       video.muted = true;
       video.playsInline = true;
+      video.preload = 'auto'; // Force browser to start loading
       video.style.width = '100%';
       video.style.height = '100%';
       video.style.objectFit = 'cover';
@@ -77,29 +71,42 @@ document.addEventListener('DOMContentLoaded', function() {
       video.style.top = '0';
       video.style.left = '0';
       video.style.zIndex = '1';
-      video.style.opacity = '0'; // Start hidden
+      video.style.opacity = '0';
       video.style.transition = 'opacity 0.3s ease';
 
       // Add video to DOM but keep hidden
       box.appendChild(video);
 
+      // Track loading progress
+      video.addEventListener('progress', () => {
+        if (video.buffered.length > 0 && video.duration > 0) {
+          const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+          const progress = (bufferedEnd / video.duration) * 100;
+          
+          // Smoothly update progress bar
+          progressBar.style.transition = 'width 0.3s ease-out';
+          progressBar.style.width = progress + '%';
+          
+          console.log('Video loading progress:', progress + '%');
+        }
+      });
+
       // When video is ready to play
       video.addEventListener('canplaythrough', () => {
-        if (!isLoading) return; // User already left hover
+        if (!isLoading) return;
         
-        // Complete progress bar immediately if not already done
-        progressBar.style.transition = 'width 0.1s ease';
+        // Ensure progress bar shows 100%
+        progressBar.style.transition = 'width 0.2s ease-out';
         progressBar.style.width = '100%';
         
         // Small delay then show video
         setTimeout(() => {
-          if (!isLoading) return; // Check again
+          if (!isLoading) return;
           
           aTag.style.opacity = '0';
           video.style.opacity = '1';
           video.play().catch(err => {
             console.log('Autoplay failed:', err);
-            // Fallback: just show the video without playing
           });
           
           // Hide progress bar after video shows
@@ -122,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
       hoverTimer = setTimeout(() => {
         if (!isLoading || !video) return;
         
+        // Show whatever has loaded
         progressBar.style.width = '100%';
         aTag.style.opacity = '0';
         video.style.opacity = '1';
@@ -132,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
           progressBar.style.width = '0';
         }, 300);
-      }, 2500); // Slightly longer than progress bar
+      }, 5000); // Longer timeout since we're waiting for actual loading
     });
 
     box.addEventListener('mouseleave', () => {

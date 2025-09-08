@@ -12,6 +12,7 @@ function toggleSidebar() {
     btn.classList.remove("attached");
   }
 }
+
 // Dropdown toggle
 document.querySelectorAll(".dropdown-btn").forEach(btn => {
   btn.addEventListener("click", function() {
@@ -23,56 +24,136 @@ document.querySelectorAll(".dropdown-btn").forEach(btn => {
     }
   });
 });
-document.querySelectorAll('.video-wallpaper').forEach(box => {
-  console.log('Found video wallpapers:', document.querySelectorAll('.video-wallpaper').length);
-  if (box.querySelector('img')) return;
-  const videoSrc = box.getAttribute('data-src');
-  const video = document.createElement('video');
-  video.src = videoSrc;
-  video.muted = true;
-  video.playsInline = true;
-  video.crossOrigin = "anonymous";
 
-  // Wait for video to be ready
-  video.addEventListener('loadeddata', () => {
-    // Seek to a frame (0.1s)
-    video.currentTime = 0.1;
+// Remove or comment out the duplicate video loading code (the first block)
+// This is causing conflicts with your hover functionality
+
+// Fixed hover functionality for video wallpapers
+document.addEventListener('DOMContentLoaded', function() {
+  const videoBoxes = document.querySelectorAll('.wallpaper-box.video-wallpaper');
+  console.log('Found video boxes:', videoBoxes.length);
+  
+  if (videoBoxes.length === 0) {
+    console.error('No video wallpapers found! Check your selectors');
+    return;
+  }
+  
+  videoBoxes.forEach(box => {
+    const progressBar = box.querySelector('.progress-bar');
+    const aTag = box.querySelector('a');
+    let video = null;
+    let isLoading = false;
+    let hoverTimer = null;
+
+    box.addEventListener('mouseenter', () => {
+      console.log('Mouse entered video box');
+      if (isLoading) return;
+
+      isLoading = true;
+
+      // Reset progress bar
+      progressBar.style.transition = 'none';
+      progressBar.style.width = '0';
+
+      // Force reflow so next transition applies
+      void progressBar.offsetWidth;
+
+      // Start animating
+      progressBar.style.transition = 'width 2s ease-out';
+      progressBar.style.width = '100%';
+
+      // Create video element and start loading immediately
+      video = document.createElement('video');
+      video.src = box.getAttribute('data-src'); // Changed from data-full to data-src
+      video.autoplay = false; // We'll play manually when ready
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = 'cover';
+      video.style.borderRadius = 'inherit';
+      video.style.position = 'absolute';
+      video.style.top = '0';
+      video.style.left = '0';
+      video.style.zIndex = '1';
+      video.style.opacity = '0'; // Start hidden
+      video.style.transition = 'opacity 0.3s ease';
+
+      // Add video to DOM but keep hidden
+      box.appendChild(video);
+
+      // When video is ready to play
+      video.addEventListener('canplaythrough', () => {
+        if (!isLoading) return; // User already left hover
+        
+        // Complete progress bar immediately if not already done
+        progressBar.style.transition = 'width 0.1s ease';
+        progressBar.style.width = '100%';
+        
+        // Small delay then show video
+        setTimeout(() => {
+          if (!isLoading) return; // Check again
+          
+          aTag.style.opacity = '0';
+          video.style.opacity = '1';
+          video.play().catch(err => {
+            console.log('Autoplay failed:', err);
+            // Fallback: just show the video without playing
+          });
+          
+          // Hide progress bar after video shows
+          setTimeout(() => {
+            progressBar.style.width = '0';
+          }, 300);
+        }, 100);
+      });
+
+      // Handle video load errors
+      video.addEventListener('error', () => {
+        console.log('Video failed to load');
+        isLoading = false;
+        progressBar.style.width = '0';
+        if (video) video.remove();
+        video = null;
+      });
+
+      // Fallback timer - if video takes too long, show it anyway
+      hoverTimer = setTimeout(() => {
+        if (!isLoading || !video) return;
+        
+        progressBar.style.width = '100%';
+        aTag.style.opacity = '0';
+        video.style.opacity = '1';
+        video.play().catch(() => {
+          // Silent fail for autoplay restrictions
+        });
+        
+        setTimeout(() => {
+          progressBar.style.width = '0';
+        }, 300);
+      }, 2500); // Slightly longer than progress bar
+    });
+
+    box.addEventListener('mouseleave', () => {
+      console.log('Mouse left video box');
+      isLoading = false;
+      clearTimeout(hoverTimer);
+      
+      // Reset progress bar quickly
+      progressBar.style.transition = 'width 0.2s ease-out';
+      progressBar.style.width = '0';
+      
+      // Show thumbnail again
+      aTag.style.opacity = '1';
+      aTag.style.transition = 'opacity 0.2s ease';
+      
+      // Remove video
+      if (video) {
+        video.pause();
+        video.remove();
+        video = null;
+      }
+    });
   });
-
-  video.addEventListener('seeked', () => {
-    // Draw the frame to canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const img = document.createElement('img');
-    img.src = "img/video-placeholder.png"; // temporary placeholder
-    img.alt = "Video Thumbnail";
-    img.style.width = "100%";
-    img.style.display = "block";
-
-    box.appendChild(img);
-    video.remove();
-  });
-
-  video.addEventListener('error', () => {
-    // Fallback: show a placeholder image or icon
-    const img = document.createElement('img');
-    img.src = "img/video-placeholder.png"; // Add a placeholder image in your img folder
-    img.alt = "Video Thumbnail Not Available";
-    img.style.width = "100%";
-    img.style.display = "block";
-    box.appendChild(img);
-    video.remove();
-  });
-
-  // Add video element to DOM (hidden) if needed for some browsers
-  video.style.display = "none";
-  box.appendChild(video);
 });
-
-
-

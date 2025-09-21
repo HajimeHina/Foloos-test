@@ -25,6 +25,17 @@ document.querySelectorAll(".dropdown-btn").forEach(btn => {
   });
 });
 
+document.querySelectorAll(".dropdown-btn").forEach(btn => {
+  btn.addEventListener("click", function() {
+    let dropdownContent = this.nextElementSibling;
+    if (dropdownContent.style.maxHeight && dropdownContent.style.maxHeight !== "0px") {
+      dropdownContent.style.maxHeight = "0";
+    } else {
+      dropdownContent.style.maxHeight = dropdownContent.scrollHeight + "px";
+    }
+  });
+});
+
 // Fixed hover functionality for video wallpapers
 document.addEventListener('DOMContentLoaded', function() {
   const videoBoxes = document.querySelectorAll('.wallpaper-box.video-wallpaper');
@@ -45,24 +56,25 @@ document.addEventListener('DOMContentLoaded', function() {
     box.addEventListener('mouseenter', () => {
       console.log('Mouse entered video box');
       if (isLoading) return;
-
       isLoading = true;
-
+      
       // Reset progress bar
       progressBar.style.transition = 'none';
       progressBar.style.width = '0';
-
-      // Force reflow so next transition applies
+      
+      // Force reflow
       void progressBar.offsetWidth;
-
-      // Create video element and start loading immediately
+      
+      // Start loading video immediately
+      console.log('Starting video load...');
+      
+      // Create video element
       video = document.createElement('video');
       video.src = box.getAttribute('data-src');
-      video.autoplay = false;
+      video.autoplay = true;
       video.loop = true;
       video.muted = true;
       video.playsInline = true;
-      video.preload = 'auto'; // Force browser to start loading
       video.style.width = '100%';
       video.style.height = '100%';
       video.style.objectFit = 'cover';
@@ -73,80 +85,73 @@ document.addEventListener('DOMContentLoaded', function() {
       video.style.zIndex = '1';
       video.style.opacity = '0';
       video.style.transition = 'opacity 0.3s ease';
-
-      // Add video to DOM but keep hidden
+      video.style.pointerEvents = 'none';
+      
       box.appendChild(video);
-
-      // Track loading progress
-      video.addEventListener('progress', () => {
-        if (video.buffered.length > 0 && video.duration > 0) {
-          const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-          const progress = (bufferedEnd / video.duration) * 100;
-          
-          // Smoothly update progress bar
-          progressBar.style.transition = 'width 0.3s ease-out';
-          progressBar.style.width = progress + '%';
-          
-          console.log('Video loading progress:', progress + '%');
+      
+      // Simulate progress bar based on video loading events
+      let progressInterval;
+      let currentProgress = 0;
+      
+      // Start progress animation
+      progressBar.style.transition = 'width 0.1s linear';
+      
+      progressInterval = setInterval(() => {
+        if (currentProgress < 90) {
+          currentProgress += Math.random() * 15; // Random increments
+          if (currentProgress > 90) currentProgress = 90;
+          progressBar.style.width = currentProgress + '%';
         }
+      }, 100);
+      
+      // When video data starts loading
+      video.addEventListener('loadstart', () => {
+        console.log('Video load started...');
       });
-
+      
       // When video is ready to play
-      video.addEventListener('canplaythrough', () => {
-        if (!isLoading) return;
+      video.addEventListener('canplay', () => {
+        console.log('Video can play, finishing progress...');
+        clearInterval(progressInterval);
         
-        // Ensure progress bar shows 100%
-        progressBar.style.transition = 'width 0.2s ease-out';
+        // Complete the progress bar
         progressBar.style.width = '100%';
         
-        // Small delay then show video
+        // Show video and hide progress bar smoothly
         setTimeout(() => {
-          if (!isLoading) return;
-          
           aTag.style.opacity = '0';
           video.style.opacity = '1';
-          video.play().catch(err => {
-            console.log('Autoplay failed:', err);
-          });
           
-          // Hide progress bar after video shows
-          setTimeout(() => {
-            progressBar.style.width = '0';
-          }, 300);
-        }, 100);
-      });
-
-      // Handle video load errors
-      video.addEventListener('error', () => {
-        console.log('Video failed to load');
-        isLoading = false;
-        progressBar.style.width = '0';
-        if (video) video.remove();
-        video = null;
-      });
-
-      // Fallback timer - if video takes too long, show it anyway
-      hoverTimer = setTimeout(() => {
-        if (!isLoading || !video) return;
-        
-        // Show whatever has loaded
-        progressBar.style.width = '100%';
-        aTag.style.opacity = '0';
-        video.style.opacity = '1';
-        video.play().catch(() => {
-          // Silent fail for autoplay restrictions
-        });
-        
-        setTimeout(() => {
+          // Hide progress bar smoothly
+          progressBar.style.transition = 'width 0.5s ease-out, opacity 0.5s ease-out';
           progressBar.style.width = '0';
-        }, 300);
-      }, 5000); // Longer timeout since we're waiting for actual loading
+          progressBar.style.opacity = '0';
+        }, 200);
+      });
+      
+      // Fallback timeout in case video doesn't load
+      setTimeout(() => {
+        if (video && video.readyState < 3) {
+          console.log('Video load timeout, showing anyway...');
+          clearInterval(progressInterval);
+          progressBar.style.width = '100%';
+          
+          setTimeout(() => {
+            aTag.style.opacity = '0';
+            video.style.opacity = '1';
+            
+            // Hide progress bar smoothly
+            progressBar.style.transition = 'width 0.5s ease-out, opacity 0.5s ease-out';
+            progressBar.style.width = '0';
+            progressBar.style.opacity = '0';
+          }, 200);
+        }
+      }, 5000);
     });
 
     box.addEventListener('mouseleave', () => {
       console.log('Mouse left video box');
       isLoading = false;
-      clearTimeout(hoverTimer);
       
       // Reset progress bar quickly
       progressBar.style.transition = 'width 0.2s ease-out';
@@ -163,5 +168,5 @@ document.addEventListener('DOMContentLoaded', function() {
         video = null;
       }
     });
-  });
+  }); 
 });
